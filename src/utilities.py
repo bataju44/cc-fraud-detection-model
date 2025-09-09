@@ -176,24 +176,35 @@ class LightGBMOptimizer(BaseOptimizer):
     
     def objective(self, trial):
         params = {
-            'objective': 'binary',  # Uses log loss (NLL)
-            'metric': 'binary_logloss',  # NLL metric
-            'num_leaves': trial.suggest_int('num_leaves', 20, 150),
-            'max_depth': trial.suggest_int('max_depth', 3, 12),
-            'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3, log=True),
-            'subsample': trial.suggest_float('subsample', 0.6, 1.0),
-            'colsample_bytree': trial.suggest_float('colsample_bytree', 0.6, 1.0),
-            'reg_alpha': trial.suggest_float('reg_alpha', 0, 10),
-            'reg_lambda': trial.suggest_float('reg_lambda', 0.1, 10),
-            'min_child_samples': trial.suggest_int('min_child_samples', 5, 100),
+            'objective': 'binary',  # Uses log loss
+            'metric': 'binary_logloss',
+            'num_leaves': trial.suggest_int('num_leaves', 7, 63),  # Reduced from 20-150
+            'max_depth': trial.suggest_int('max_depth', 3, 8),     # Reduced from 3-12
+            'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.2, log=True),
+            'subsample': trial.suggest_float('subsample', 0.8, 1.0),  # Increased minimum
+            'colsample_bytree': trial.suggest_float('colsample_bytree', 0.8, 1.0),  # Increased minimum
+            'reg_alpha': trial.suggest_float('reg_alpha', 0, 5),
+            'reg_lambda': trial.suggest_float('reg_lambda', 0.1, 5),
+            'min_child_samples': trial.suggest_int('min_child_samples', 20, 100),  # Increased minimum
+            'min_child_weight': trial.suggest_float('min_child_weight', 1e-3, 10, log=True),  # NEW: Add min_child_weight
+            'min_split_gain': trial.suggest_float('min_split_gain', 0, 0.1),  # NEW: Add min_split_gain
             'scale_pos_weight': self.class_weight,
             'verbosity': -1,
             'device': 'gpu',
-            'random_state': 42
+            'random_state': 42,
+            'boosting_type': 'gbdt',  # Fixed to gradient boosting
+            'n_estimators': 100,      # Fixed number of estimators
         }
         
         model = LGBMClassifier(**params)
-        return self._evaluate_model(model)
+        
+        try:
+            score = self._evaluate_model(model)
+            return score
+        except Exception as e:
+            print(f"LightGBM failed with parameters: {params}")
+            print(f"Error: {e}")
+            return 0.001  # Return very low score on failure
     
     def get_best_model(self):
         best_params = self.best_params.copy()
@@ -203,7 +214,9 @@ class LightGBMOptimizer(BaseOptimizer):
             'scale_pos_weight': self.class_weight,
             'verbosity': -1,
             'device': 'gpu',
-            'random_state': 42
+            'random_state': 42,
+            'boosting_type': 'gbdt',
+            'n_estimators': 200,  # More estimators for final model
         })
         return LGBMClassifier(**best_params)
 
@@ -524,7 +537,7 @@ class DNNOptimizer(BaseOptimizer):
             'kernel_initializer': kernel_initializer,
             'batch_size': trial.suggest_categorical('batch_size', [64, 128]),  # Larger batches
             'use_batch_norm': trial.suggest_categorical('use_batch_norm', [True]),
-            'epochs': 50,  # Reduced from 150
+            'epochs': 50,  # Reduced from 150 for faster testing
             'class_weight': self.class_weight,
             'verbose': 0,
             'loss': 'binary_crossentropy',
@@ -576,7 +589,7 @@ class ModelComparator:
         """Optimize and evaluate a specific model with proper validation split"""
         print(f"Optimizing {model_name}...")
         
-        # CRITICAL FIX: Create validation split from TRAINING data
+        # Create validation split from TRAINING data
         from sklearn.model_selection import train_test_split
         
         # Split training data into train/validation for optimization
@@ -599,7 +612,7 @@ class ModelComparator:
         if model_name not in optimizers:
             raise ValueError(f"Unknown model: {model_name}")
         
-        # Use the VALIDATION split for optimization (NOT test data!)
+        # Use the VALIDATION split for optimization 
         optimizer = optimizers[model_name](
             X_train_opt, y_train_opt,      # Training data for optimization
             X_val_opt, y_val_opt,          # Validation data for optimization
