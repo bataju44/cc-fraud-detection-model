@@ -1,6 +1,6 @@
 # Credit Card Fraud Detection ML model
 Complete machine learning project for credit card fraud detection with advanced handling of extreme class imbalance (0.17% fraud rate). Includes full code, notebooks, and comprehensive evaluation.
-Estimate and Prediction of credit card fraud rates with 97.89% ROC and 99% accuracy. 
+Estimate and Prediction of credit card fraud rates with 97.89% ROC and 99% accuracy. The code also live on [Kaggle](https://www.kaggle.com/datasets/bataju/fraud-detection-ml-project-code-and-ml-pipeline/data/code)
 
 # Contents
 * src/utilities.py - Main utility classes for model training and evaluation
