@@ -11,7 +11,7 @@ Estimate and Prediction of credit card fraud rates with 97.89% ROC and 99% accur
 
 * requirements.txt - Python dependencies
 
-#Key Features
+# Key Features
 
 * Multiple ML models (XGBoost, LightGBM, DNN, Random Forest, SVM)
 
@@ -23,7 +23,7 @@ Estimate and Prediction of credit card fraud rates with 97.89% ROC and 99% accur
 
 * Professional reporting system
 
-#Usage
+# Usage
 
 * Add [Credit Card Fraud Detection](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud) dataset to your Kaggle notebook
 
@@ -32,7 +32,7 @@ Estimate and Prediction of credit card fraud rates with 97.89% ROC and 99% accur
 * Run the analysis notebook
 
 
-📊 Quick Performance Summary:  
+# 📊 Quick Performance Summary:  
 
 | Model    | AUC-ROC | AUC-PR | F1     | Precision | Recall  | Accuracy |
 |----------|---------|--------|--------|-----------|---------|----------|
@@ -42,5 +42,6 @@ Estimate and Prediction of credit card fraud rates with 97.89% ROC and 99% accur
 
 ![Radarplot](reports/radar_chart.png)
 
+## Probability Distribution from the output of ML models
 ![model](reports/probability_distributions.png)
 
