@@ -1,4 +1,4 @@
-# cc-fraud-detection-model
+# Credit Card Fraud Detection ML model
 Complete machine learning project for credit card fraud detection with advanced handling of extreme class imbalance (0.17% fraud rate). Includes full code, notebooks, and comprehensive evaluation.
 Estimate and Prediction of credit card fraud rates with 97.89% ROC and 99% accuracy. 
 
